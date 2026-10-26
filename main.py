@@ -3144,16 +3144,6 @@ def entry_block_reason(ctx: Dict[str, Any]) -> Optional[str]:
 
 
 
-    # Drawdown Filter 1: 4h 0.5% Master Switch (|P_now - P_4h| / P_4h >= 0.50%)
-
-    move_4h = ctx.get("move_4h_pct")
-
-    if move_4h is not None and move_4h < 0.50:
-
-        return f"drawdown_4h_switch_gated ({move_4h:.2f}% < 0.50%)"
-
-
-
     # Circuit Breaker: 2 consecutive losses -> pause 4 markets (60 min)
 
     now_ms = time.time() * 1000
@@ -3712,7 +3702,7 @@ async def update_loop():
 
             closes = [c["close"] for c in klines_1m]
 
-            rsi_now = None  # Micro-vetoes OFF as per Stage 9 specification
+            rsi_now = None  # Micro-vetoes OFF as per Stage 8 specification
 
 
 
@@ -4112,7 +4102,7 @@ async def update_loop():
 
                 "strategy_champion": {
 
-                    "strategy_name": "Stage 9: Drawdown Filter 1 — 4h 0.5% Master Switch",
+                    "strategy_name": "Stage 8: Immediate Open Entry (+ Anti-Exhaustion <12 bp, Cheap Odds 40¢–58¢)",
 
                     "max_entry_price": 0.58,
 
@@ -4151,8 +4141,6 @@ async def update_loop():
                     "prior_body_max_bp": 12.0,
 
                     "move_4h_pct": move_4h_pct,
-
-                    "min_4h_move_pct": 0.50,
 
                 },
 
@@ -4300,7 +4288,7 @@ async def lifespan(app: FastAPI):
 
 
 
-app = FastAPI(title="Polymarket BTC 15m Assistant [4h Master Switch]", lifespan=lifespan)
+app = FastAPI(title="Polymarket BTC 15m Assistant [Immediate Open Entry]", lifespan=lifespan)
 
 TEMPLATES_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), "templates")
 
@@ -5430,7 +5418,7 @@ if __name__ == "__main__":
 
     import uvicorn
 
-    port = int(os.getenv("PORT", 8085))
+    port = int(os.getenv("PORT", 8084))
 
     uvicorn.run(app, host="0.0.0.0", port=port)
 
